@@ -1,22 +1,63 @@
+=== BtW Importer ===
+Contributors: silversh  
+Donate link: https://paypal.me/StoreDot2  
+Tags: blogger, blogspot, blogger importer, blogspot importer, import blogspot  
+Requires at least: 6.8  
+Tested up to: 6.8  
+Stable tag: 1.0.0  
+Requires PHP: 7.4  
+License: MIT  
+License URI: https://github.com/mnasikin/btw-importer/blob/main/LICENSE  
 
-# BtW Importer
+BtW Importer migrates your Blogger/Blogspot content to WordPress with a single click using your .atom file.
 
-**BtW Importer (Blogger/Blogspot to WordPress Importer)** is a fast, intuitive migration tool that lets you move from Blogger to WordPress with a single click. Simply upload your `.atom` file from Google Takeout, and the importer will take care of the rest. automatically scanning and downloading images, replacing outdated URLs, setting featured images from the first post image, and showing live progress every step of the way.
+== Description ==
+BtW Importer is a powerful yet simple migration tool that helps you seamlessly transfer your content from Blogger (Blogspot) to WordPress with minimal effort. Whether you're a casual blogger or managing a large archive, this plugin handles the complex parts so you don’t have to.
 
-## Requirements
-Before you begin, make sure you’ve downloaded your Blogger `.atom` file via Google Takeout:
+With just one click, BtW Importer lets you upload your .atom file from Google Takeout and automatically imports your posts—images, links, formatting, and more. It also enhances your content by downloading embedded images, replacing Blogger URLs with WordPress-friendly links, and setting featured images based on the first image in each post. Plus, you’ll get real-time progress feedback so you can watch the migration unfold with confidence.
 
-Blogger → Settings → Back Up → Click Download (This redirects to Google Takeout where you’ll get the `.atom` file)
+Designed to be fast, reliable, and compatible with WordPress 6.8+, this plugin streamlines the process and saves you hours of manual work.
 
-## Usage
-1. Activate the Plugin Once installed, go to your WordPress dashboard and activate BtW Importer.
-2. A new menu item called BtW Importer will appear, click it to begin.
-3. Choose Your .atom File Select the Blogger .atom file from your local storage.
-4. Hit the Start Import button and let the plugin do its work.
-5. Track Progress in Real Time The tool displays live progress so you can monitor the migration status.
-6. Done! Once the process completes, your Blogger content will be fully migrated to WordPress.
+* Scans and downloads embedded images  
+* Replaces outdated URLs  
+* Sets featured images from the first post image  
+* Shows live progress during import  
 
-## Changelog
+Supports image formats: jpg, jpeg, png, gif, webp, bmp, svg, tiff, avif, ico.
 
-#### 1.0.0 / 2025-07-08
-Initial release of BtW Importer
+To get your `.atom` file:
+Blogger → Settings → Back Up → Download → Redirects to Google Takeout
+
+== Requirements ==
+* PHP 7.2 or later  
+* cURL PHP Extension  
+* `allow_url_fopen` enabled  
+* Writable `wp-content/uploads` folder (default setting already meets this)
+
+== Installation ==
+1. Upload the plugin files to `/wp-content/plugins/btw-importer`, or install via the WordPress plugin screen directly.  
+2. Activate the plugin via the **Plugins** screen in WordPress.  
+3. Open the **BtW Importer** menu from your dashboard.
+
+== Screenshots ==
+1. Preview of the import process interface
+
+== Usage ==
+1. Download your Blogger `.atom` file from Google Takeout  
+2. Open the **BtW Importer** menu in WordPress  
+3. Upload the `.atom` file from your local storage  
+4. Click **Start Import**  
+5. Monitor the live progress  
+6. Done! Your Blogger content is now available in WordPress
+
+== Changelog ==
+= 1.0.0 – 2025-07-08 =
+* Initial release  
+* Replaced `parse_url()` with `wp_parse_url()`  
+* Used `wp_delete_file()` instead of `unlink()`  
+* Sanitized input using `wp_unslash()`  
+* Sanitized content with `wp_kses_post()`
+
+== Upgrade Notice ==
+= 1.0.0 =
+Initial release of BtW Importer with basic Blogger migration features.

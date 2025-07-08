@@ -2,14 +2,14 @@
 /*
 Plugin Name:        BtW Importer
 Plugin URI:         https://github.com/mnasikin/btw-importer
-Description:        BtW Importer (Blogger/Blogspot to WordPress Importer) is a simple but powerful blogger importer allow you to Import Blogger .atom file from Google takeout, scan & download image, replace URLs, set featured image based on firs image, show live progress.
+Description:        Simple yet powerful plugin to Migrate Blogger to WordPress in one click. Import .atom from Google Takeout and the plugin will scan & download first image, replace URLs, set featured image, show live progress.
 Version:            1.0.0
 Author:             Nasikin
 License:            MIT
 Domain Path:        /languages
 Text Domain:        btw-importer
 Network:            true
-Requires PHP:       7.2
+Requires PHP:       7.4
 GitHub Plugin URI:  https://github.com/mnasikin/btw-importer
 Primary Branch:     main
 */
@@ -47,8 +47,7 @@ class BTW_Importer {
 
     public function import_page() {
         echo '<div class="wrap">
-            <h1>BtW Importer</h1>
-            <p>Supported file: .atom, .xml</p>
+            <h1>BtW Import Blogger .atom</h1>
             <input type="file" id="atomFile" accept=".xml,.atom" />
             <button id="startImport" class="button button-primary">Start Import</button>
             <div id="progress" style="margin-top:20px; max-height:400px; overflow:auto; background:#fff; padding:10px; border:1px solid #ddd;"></div>
@@ -58,6 +57,7 @@ class BTW_Importer {
     public function ajax_prepare_import() {
         check_ajax_referer( 'btw_importer_nonce', 'nonce' );
         $atom_content = isset( $_POST['atom_content'] ) ? wp_unslash( $_POST['atom_content'] ) : '';
+
         if ( empty( $atom_content ) ) { wp_send_json_error( 'No data received.' ); }
 
         if ( ! class_exists( 'SimplePie' ) ) {
@@ -70,14 +70,14 @@ class BTW_Importer {
         $feed->init();
 
         $items = $feed->get_items() ?: array();
-
         $posts = array();
+
         foreach ( $items as $item ) {
             $posts[] = array(
-                'title'   => $item->get_title(),
-                'content' => $item->get_content(),
-                'date'    => $item->get_date( 'Y-m-d H:i:s' ),
-                'author'  => $item->get_author() ? $item->get_author()->get_name() : ''
+                'title'   => sanitize_text_field( $item->get_title() ),
+                'content' => $item->get_content(), // keep HTML
+                'date'    => sanitize_text_field( $item->get_date( 'Y-m-d H:i:s' ) ),
+                'author'  => $item->get_author() ? sanitize_text_field( $item->get_author()->get_name() ) : ''
             );
         }
         wp_send_json_success( array( 'posts' => $posts ) );
@@ -86,14 +86,14 @@ class BTW_Importer {
     public function ajax_import_single_post() {
         check_ajax_referer( 'btw_importer_nonce', 'nonce' );
 
-        $post = $_POST['post'] ?? array();
-        if ( empty( $post ) ) wp_send_json_error( 'Missing post data.' );
+        $raw_post = isset( $_POST['post'] ) ? wp_unslash( $_POST['post'] ) : array();
+        if ( empty( $raw_post ) ) wp_send_json_error( 'Missing post data.' );
 
-        $title = sanitize_text_field( $post['title'] );
-        $content_raw = $post['content'];
-        $content = html_entity_decode( $content_raw );
-        $date = sanitize_text_field( $post['date'] );
-        $author_name = sanitize_text_field( $post['author'] );
+        $title = sanitize_text_field( $raw_post['title'] ?? '' );
+        $content_raw = $raw_post['content'] ?? '';
+        $content = wp_kses_post( $content_raw );
+        $date = sanitize_text_field( $raw_post['date'] ?? '' );
+        $author_name = sanitize_text_field( $raw_post['author'] ?? '' );
 
         $msgs = array( '📄 Importing post: '.esc_html($title) );
 
@@ -107,7 +107,7 @@ class BTW_Importer {
         require_once ABSPATH.'wp-admin/includes/file.php';
         require_once ABSPATH.'wp-admin/includes/media.php';
 
-        // Step 1: insert post first with raw content
+        // Step 1: insert post first
         $post_id = wp_insert_post([
             'post_title'   => $title,
             'post_content' => $content,
@@ -118,23 +118,25 @@ class BTW_Importer {
 
         if ( is_wp_error( $post_id ) ) wp_send_json_error('❌ Failed to insert: '.$title);
 
-        // Step 2: find unique image URLs by common extensions
+        // Step 2: find unique image URLs
         preg_match_all('/https?:\/\/[^"\']+\.(jpg|jpeg|png|gif|webp|bmp|svg|tiff|avif|ico)/i', $content, $matches);
-        $unique_urls = array_unique($matches[0]);
+        $unique_urls = array_unique( $matches[0] );
 
         if ( ! empty( $unique_urls ) ) {
             $first_url = $unique_urls[0];
             $msgs[] = '⏳ Downloading first image: '.$first_url;
+
             $tmp = download_url( $first_url );
-            if ( is_wp_error($tmp) ) {
+            if ( is_wp_error( $tmp ) ) {
                 $msgs[]='⚠ Failed to download first image';
             } else {
-                $desc = basename( parse_url( $first_url, PHP_URL_PATH ) ) ?: 'image.jpg';
+                $parsed = wp_parse_url( $first_url );
+                $desc = ! empty( $parsed['path'] ) ? basename( $parsed['path'] ) : 'image.jpg';
                 $file = ['name'=>$desc,'tmp_name'=>$tmp];
-                $media_id = media_handle_sideload($file,$post_id); // attach to post
+                $media_id = media_handle_sideload($file,$post_id);
 
                 if ( is_wp_error($media_id) ) {
-                    @unlink($tmp);
+                    wp_delete_file($tmp);
                     $msgs[]='⚠ Failed to attach first image';
                 } else {
                     $new_url = wp_get_attachment_url($media_id);
@@ -152,7 +154,7 @@ class BTW_Importer {
             $msgs[]='⚠ No image URLs found in content';
         }
 
-        // Step 3: update post content if changed
+        // Step 3: update content if changed
         wp_update_post(['ID'=>$post_id,'post_content'=>$content]);
 
         $msgs[]='✅ Finished post: '.$title;

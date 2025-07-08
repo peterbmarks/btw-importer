@@ -21,4 +21,8 @@ Blogger → Settings → Back Up → Click Download (This redirects to Google Ta
 ## Changelog
 
 #### 1.0.0 / 2025-07-08
-Initial release of BtW Importer
+1. Initial release of BtW Importer
+2. wp_parse_url() used instead of parse_url()
+3. wp_delete_file() used instead unlink()
+4. input properly wp_unslash() and sanitized
+5. content sanitized with wp_kses_post()
