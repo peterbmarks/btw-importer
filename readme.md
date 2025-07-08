@@ -1,28 +1,58 @@
+[![Download Plugin](https://img.shields.io/badge/download_plugin-000?style=for-the-badge&logo=download&logoColor=white)](https://github.com/mnasikin/btw-importer/archive/refs/heads/main.zip)
 
 # BtW Importer
 
-**BtW Importer (Blogger/Blogspot to WordPress Importer)** is a fast, intuitive migration tool that lets you move from Blogger to WordPress with a single click. Simply upload your `.atom` file from Google Takeout, and the importer will take care of the rest. automatically scanning and downloading images, replacing outdated URLs, setting featured images from the first post image, and showing live progress every step of the way.
+**BtW Importer** migrates your Blogger/Blogspot content to WordPress with a single click using your `.atom` file.
 
-[![Download Plugin](https://img.shields.io/badge/download_plugin-000?style=for-the-badge&logo=download&logoColor=white)](https://github.com/mnasikin/btw-importer/archive/refs/heads/main.zip)
+A powerful yet simple migration tool, BtW Importer helps you seamlessly transfer posts, images, and formatting from Blogger (Blogspot) to WordPress. Whether you're a casual blogger or managing a large archive, this plugin handles the complex parts so you don’t have to.
 
-## Requirements
-Before you begin, make sure you’ve downloaded your Blogger `.atom` file via Google Takeout:
+## ✨ Features
 
-Blogger → Settings → Back Up → Click Download (This redirects to Google Takeout where you’ll get the `.atom` file)
+- Scans and downloads embedded images  
+- Replaces outdated Blogger URLs with WordPress-friendly links  
+- Sets featured images using the first image in each post  
+- Displays real-time progress during import  
+- Supports image formats: `jpg`, `jpeg`, `png`, `gif`, `webp`, `bmp`, `svg`, `tiff`, `avif`, `ico`
 
-## Usage
-1. Activate the Plugin Once installed, go to your WordPress dashboard and activate BtW Importer.
-2. A new menu item called BtW Importer will appear, click it to begin.
-3. Choose Your .atom File Select the Blogger .atom file from your local storage.
-4. Hit the Start Import button and let the plugin do its work.
-5. Track Progress in Real Time The tool displays live progress so you can monitor the migration status.
-6. Done! Once the process completes, your Blogger content will be fully migrated to WordPress.
+## 📝 Requirements
 
-## Changelog
+- PHP `7.4` or later  
+- cURL PHP extension  
+- `allow_url_fopen` enabled  
+- Writable `wp-content/uploads` folder (default configuration meets this)
 
-#### 1.0.0 / 2025-07-08
-1. Initial release of BtW Importer
-2. wp_parse_url() used instead of parse_url()
-3. wp_delete_file() used instead unlink()
-4. input properly wp_unslash() and sanitized
-5. content sanitized with wp_kses_post()
+## 📦 Installation
+
+1. Upload the plugin files to `/wp-content/plugins/btw-importer`, or install via the WordPress plugin screen.  
+2. Activate the plugin via **Plugins** in your WordPress dashboard.  
+3. Access the **BtW Importer** menu from the dashboard sidebar.
+
+## 📷 Screenshots
+
+1. Preview of the import process interface (add your image here!)
+
+## 🚀 Usage
+
+1. Download your `.atom` file:  
+   `Blogger → Settings → Back Up → Download → redirects to Google Takeout`
+2. Open the **BtW Importer** menu in WordPress  
+3. Upload the `.atom` file from your local storage  
+4. Click **Start Import**  
+5. Monitor the live progress  
+6. Done! Your Blogger content is now in WordPress
+
+## 🧾 Changelog
+
+### 1.0.0 – 2025-07-08
+- Initial release  
+- Replaced `parse_url()` with `wp_parse_url()`  
+- Used `wp_delete_file()` instead of `unlink()`  
+- Sanitized input using `wp_unslash()`  
+- Sanitized content with `wp_kses_post()`
+
+## 📢 Upgrade Notice
+
+### 1.0.0
+Initial release of BtW Importer with Blogger `.atom` file support, media handling, and migration enhancements.
+
+---
