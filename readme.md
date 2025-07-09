@@ -1,4 +1,4 @@
-[![Download Plugin](https://img.shields.io/badge/download_plugin-000?style=for-the-badge&logo=download&logoColor=white)](https://github.com/mnasikin/btw-importer/archive/refs/heads/main.zip)
+[![Download Plugin](https://img.shields.io/badge/download_plugin-000?style=for-the-badge&logo=download&logoColor=white)](https://nasikin.web.id/download/btw-importer.zip)
 
 # BtW Importer
 
@@ -12,7 +12,7 @@ A powerful yet simple migration tool, BtW Importer helps you seamlessly transfer
 - Replaces outdated Blogger URLs with WordPress-friendly links  
 - Sets featured images using the first image in each post  
 - Displays real-time progress during import  
-- Supports image formats: `jpg`, `jpeg`, `png`, `gif`, `webp`, `bmp`, `svg`, `tiff`, `avif`, `ico`
+- Supports image formats: `jpg`, `jpeg`, `png`, `gif`, `webp`, `bmp`, `svg`, `tiff`, `avif`, `ico`. Undownloaded images and videos still embedded, but with external files.
 
 ## 📝 Requirements
 
@@ -29,7 +29,7 @@ A powerful yet simple migration tool, BtW Importer helps you seamlessly transfer
 
 ## 📷 Screenshots
 
-1. Preview of the import process interface (add your image here!)
+![Process Screenshot](https://raw.githubusercontent.com/mnasikin/btw-importer/refs/heads/main/assets/screenshot.png)
 
 ## 🚀 Usage
 
