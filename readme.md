@@ -43,7 +43,7 @@ A powerful yet simple migration tool, BtW Importer helps you seamlessly transfer
 
 ## 🧾 Changelog
 
-### 1.0.0 - 2025-07-10
+### 1.1.0 - 2025-07-10
 - Fix Pages imported as Posts. Should now correctly import pages as WordPress Pages
 
 
