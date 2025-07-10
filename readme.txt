@@ -4,7 +4,7 @@ Donate link: https://paypal.me/StoreDot2
 Tags: blogger, blogspot, blogger importer, blogspot importer, import blogspot  
 Requires at least: 6.8  
 Tested up to: 6.8  
-Stable tag: 1.0.0  
+Stable tag: 1.1.0  
 Requires PHP: 7.4  
 License: MIT  
 License URI: https://github.com/mnasikin/btw-importer/blob/main/LICENSE  
@@ -51,6 +51,8 @@ Blogger → Settings → Back Up → Download → Redirects to Google Takeout
 6. Done! Your Blogger content is now available in WordPress
 
 == Changelog ==
+= 1.1.0 – 2025-07-10 =
+* Fix Pages imported as Posts. Should now correctly import pages as WordPress Pages
 = 1.0.0 – 2025-07-08 =
 * Initial release  
 * Replaced `parse_url()` with `wp_parse_url()`  
@@ -59,5 +61,7 @@ Blogger → Settings → Back Up → Download → Redirects to Google Takeout
 * Sanitized content with `wp_kses_post()`
 
 == Upgrade Notice ==
+= 1.1.0 =
+Fix Pages imported as Posts. Should now correctly import pages as WordPress Pages
 = 1.0.0 =
 Initial release of BtW Importer with basic Blogger migration features.

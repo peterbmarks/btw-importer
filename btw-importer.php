@@ -3,7 +3,7 @@
 Plugin Name:        BtW Importer
 Plugin URI:         https://github.com/mnasikin/btw-importer
 Description:        Simple yet powerful plugin to Migrate Blogger to WordPress in one click. Import .atom from Google Takeout and the plugin will scan & download first image, replace URLs, set featured image, show live progress.
-Version:            1.0.0
+Version:            1.1.0
 Author:             Nasikin
 License:            MIT
 Domain Path:        /languages
@@ -17,12 +17,13 @@ Primary Branch:     main
 if ( ! defined( 'ABSPATH' ) ) exit;
 
 class BTW_Importer {
+    private $downloaded_images = []; // cache to avoid duplicate downloads
 
     public function __construct() {
-        add_action( 'admin_menu', array( $this, 'add_menu' ) );
-        add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
-        add_action( 'wp_ajax_btw_prepare_import', array( $this, 'ajax_prepare_import' ) );
-        add_action( 'wp_ajax_btw_import_single_post', array( $this, 'ajax_import_single_post' ) );
+        add_action( 'admin_menu', [$this, 'add_menu'] );
+        add_action( 'admin_enqueue_scripts', [$this, 'enqueue_scripts'] );
+        add_action( 'wp_ajax_btw_prepare_import', [$this, 'ajax_prepare_import'] );
+        add_action( 'wp_ajax_btw_import_single_post', [$this, 'ajax_import_single_post'] );
     }
 
     public function add_menu() {
@@ -31,18 +32,18 @@ class BTW_Importer {
             'BtW Importer',
             'manage_options',
             'btw-importer',
-            array( $this, 'import_page' ),
+            [$this, 'import_page'],
             'dashicons-upload'
         );
     }
 
     public function enqueue_scripts( $hook ) {
         if ( $hook !== 'toplevel_page_btw-importer' ) return;
-        wp_enqueue_script( 'btw-importer', plugin_dir_url( __FILE__ ) . 'btw-importer.js', array( 'jquery' ), '1.0', true );
-        wp_localize_script( 'btw-importer', 'btwImporter', array(
+        wp_enqueue_script( 'btw-importer', plugin_dir_url(__FILE__).'btw-importer.js', ['jquery'], '1.5', true );
+        wp_localize_script( 'btw-importer', 'btwImporter', [
             'ajaxUrl' => admin_url( 'admin-ajax.php' ),
             'nonce'   => wp_create_nonce( 'btw_importer_nonce' )
-        ));
+        ]);
     }
 
     public function import_page() {
@@ -55,110 +56,130 @@ class BTW_Importer {
     }
 
     public function ajax_prepare_import() {
-        check_ajax_referer( 'btw_importer_nonce', 'nonce' );
-        $atom_content = isset( $_POST['atom_content'] ) ? wp_unslash( $_POST['atom_content'] ) : '';
+    check_ajax_referer( 'btw_importer_nonce', 'nonce' );
+    $atom_content = isset( $_POST['atom_content'] ) ? wp_unslash( $_POST['atom_content'] ) : '';
+    if ( empty( $atom_content ) ) { wp_send_json_error( 'No data received.' ); }
 
-        if ( empty( $atom_content ) ) { wp_send_json_error( 'No data received.' ); }
+    $posts = [];
 
-        if ( ! class_exists( 'SimplePie' ) ) {
-            require_once ABSPATH . WPINC . '/class-simplepie.php';
-        }
-
-        $feed = new SimplePie();
-        $feed->set_raw_data( $atom_content );
-        $feed->enable_cache( false );
-        $feed->init();
-
-        $items = $feed->get_items() ?: array();
-        $posts = array();
-
-        foreach ( $items as $item ) {
-            $posts[] = array(
-                'title'   => sanitize_text_field( $item->get_title() ),
-                'content' => $item->get_content(), // keep HTML
-                'date'    => sanitize_text_field( $item->get_date( 'Y-m-d H:i:s' ) ),
-                'author'  => $item->get_author() ? sanitize_text_field( $item->get_author()->get_name() ) : ''
-            );
-        }
-        wp_send_json_success( array( 'posts' => $posts ) );
+    libxml_use_internal_errors(true);
+    $xml = simplexml_load_string( $atom_content );
+    if (!$xml) {
+        wp_send_json_error('Failed to parse XML.');
     }
+
+    // Blogger feeds use namespace, so register it
+    $ns = $xml->getNamespaces(true);
+
+    foreach ( $xml->entry as $entry ) {
+        // Default type
+        $post_type = 'post';
+
+        // Read <blogger:type> tag
+        $bloggerType = (string) $entry->children('blogger', true)->type;
+        if ( strtoupper($bloggerType) === 'PAGE' ) {
+            $post_type = 'page';
+        }
+
+        // Title
+        $title = sanitize_text_field( (string) $entry->title );
+
+        // Content
+        $content = (string) $entry->content;
+
+        // Author
+        $author = isset($entry->author->name) ? sanitize_text_field( (string) $entry->author->name ) : '';
+
+        // Date (published)
+        $date = isset($entry->published) ? sanitize_text_field( (string) $entry->published ) : current_time('mysql');
+
+        $posts[] = [
+            'title'     => $title,
+            'content'   => $content,
+            'date'      => $date,
+            'author'    => $author,
+            'post_type' => $post_type
+        ];
+    }
+
+    wp_send_json_success( [ 'posts' => $posts ] );
+}
+
 
     public function ajax_import_single_post() {
         check_ajax_referer( 'btw_importer_nonce', 'nonce' );
+        $raw_post = isset($_POST['post']) ? wp_unslash($_POST['post']) : [];
+        if ( empty($raw_post) ) wp_send_json_error('Missing post data.');
 
-        $raw_post = isset( $_POST['post'] ) ? wp_unslash( $_POST['post'] ) : array();
-        if ( empty( $raw_post ) ) wp_send_json_error( 'Missing post data.' );
+        $title     = sanitize_text_field($raw_post['title'] ?? '');
+        $content   = wp_kses_post($raw_post['content'] ?? '');
+        $date      = sanitize_text_field($raw_post['date'] ?? '');
+        $author    = sanitize_text_field($raw_post['author'] ?? '');
+        $post_type = in_array($raw_post['post_type'], ['post','page']) ? $raw_post['post_type'] : 'post';
 
-        $title = sanitize_text_field( $raw_post['title'] ?? '' );
-        $content_raw = $raw_post['content'] ?? '';
-        $content = wp_kses_post( $content_raw );
-        $date = sanitize_text_field( $raw_post['date'] ?? '' );
-        $author_name = sanitize_text_field( $raw_post['author'] ?? '' );
-
-        $msgs = array( '📄 Importing post: '.esc_html($title) );
+        $msgs = ['📄 Importing '.ucfirst($post_type).': '.$title];
 
         $author_id = 1;
-        if ( $author_name ) {
-            $user = get_user_by( 'login', sanitize_user( $author_name, true ) );
+        if ( $author ) {
+            $user = get_user_by('login', sanitize_user($author, true));
             if ( $user ) $author_id = $user->ID;
         }
 
+        // needed for media_handle_sideload
         require_once ABSPATH.'wp-admin/includes/image.php';
         require_once ABSPATH.'wp-admin/includes/file.php';
         require_once ABSPATH.'wp-admin/includes/media.php';
 
-        // Step 1: insert post first
+        // insert post first
         $post_id = wp_insert_post([
             'post_title'   => $title,
             'post_content' => $content,
             'post_status'  => 'publish',
             'post_date'    => $date,
-            'post_author'  => $author_id
+            'post_author'  => $author_id,
+            'post_type'    => $post_type
         ]);
+        if ( is_wp_error($post_id) ) wp_send_json_error('❌ Failed to insert: '.$title);
 
-        if ( is_wp_error( $post_id ) ) wp_send_json_error('❌ Failed to insert: '.$title);
-
-        // Step 2: find unique image URLs
+        // find unique images
         preg_match_all('/https?:\/\/[^"\']+\.(jpg|jpeg|png|gif|webp|bmp|svg|tiff|avif|ico)/i', $content, $matches);
-        $unique_urls = array_unique( $matches[0] );
+        $unique_urls = array_unique($matches[0]);
 
-        if ( ! empty( $unique_urls ) ) {
-            $first_url = $unique_urls[0];
-            $msgs[] = '⏳ Downloading first image: '.$first_url;
-
-            $tmp = download_url( $first_url );
-            if ( is_wp_error( $tmp ) ) {
-                $msgs[]='⚠ Failed to download first image';
-            } else {
-                $parsed = wp_parse_url( $first_url );
-                $desc = ! empty( $parsed['path'] ) ? basename( $parsed['path'] ) : 'image.jpg';
-                $file = ['name'=>$desc,'tmp_name'=>$tmp];
-                $media_id = media_handle_sideload($file,$post_id);
-
-                if ( is_wp_error($media_id) ) {
-                    wp_delete_file($tmp);
-                    $msgs[]='⚠ Failed to attach first image';
-                } else {
-                    $new_url = wp_get_attachment_url($media_id);
-                    if ($new_url) {
-                        foreach($unique_urls as $old_url) {
-                            $content = str_replace($old_url, $new_url, $content);
-                            $msgs[] = '✅ Replaced: '.$old_url.' → '.$new_url;
-                        }
-                        set_post_thumbnail($post_id,$media_id);
-                        $msgs[]='⭐ First image set as featured';
-                    }
-                }
+        $first_media_id = null;
+        foreach ( $unique_urls as $img_url ) {
+            if ( isset($this->downloaded_images[$img_url]) ) {
+                $new_url = $this->downloaded_images[$img_url];
+                $content = str_replace($img_url, $new_url, $content);
+                $msgs[]='✅ Used cached: '.$new_url;
+                continue;
             }
-        } else {
-            $msgs[]='⚠ No image URLs found in content';
+            $msgs[]='⏳ Downloading image: '.$img_url;
+            $tmp = download_url($img_url);
+            if ( is_wp_error($tmp) ) { $msgs[]='⚠ Failed to download'; continue; }
+            $parsed = wp_parse_url($img_url);
+            $desc = !empty($parsed['path']) ? basename($parsed['path']) : 'image.jpg';
+            $file = ['name'=>$desc,'tmp_name'=>$tmp];
+            $media_id = media_handle_sideload($file,$post_id);
+            if ( is_wp_error($media_id) ) { wp_delete_file($tmp); $msgs[]='⚠ Failed to attach'; continue; }
+            $new_url = wp_get_attachment_url($media_id);
+            if ($new_url) {
+                $this->downloaded_images[$img_url] = $new_url;
+                $content = str_replace($img_url, $new_url, $content);
+                $msgs[]='✅ Replaced: '.$img_url.' → '.$new_url;
+                if (!$first_media_id) $first_media_id = $media_id;
+            }
         }
 
-        // Step 3: update content if changed
+        // update content and set featured image
         wp_update_post(['ID'=>$post_id,'post_content'=>$content]);
+        if ( $first_media_id ) {
+            set_post_thumbnail($post_id, $first_media_id);
+            $msgs[]='⭐ First image set as featured';
+        }
 
-        $msgs[]='✅ Finished post: '.$title;
+        $msgs[]='✅ Finished '.$post_type.': '.$title;
         wp_send_json_success($msgs);
     }
 }
+
 new BTW_Importer();
