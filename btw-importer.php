@@ -3,7 +3,7 @@
 Plugin Name:        BtW Importer
 Plugin URI:         https://github.com/mnasikin/btw-importer
 Description:        Simple yet powerful plugin to Migrate Blogger to WordPress in one click. Import .atom from Google Takeout and the plugin will scan & download first image, replace URLs, set featured image, show live progress.
-Version:            1.1.0
+Version:            1.1.1
 Author:             Nasikin
 License:            MIT
 Domain Path:        /languages
@@ -15,6 +15,21 @@ Primary Branch:     main
 */
 
 if ( ! defined( 'ABSPATH' ) ) exit;
+
+require 'updater/plugin-update-checker.php';
+use YahnisElsts\PluginUpdateChecker\v5\PucFactory;
+
+$myUpdateChecker = PucFactory::buildUpdateChecker(
+    'https://github.com/mnasikin/btw-importer/',
+    __FILE__,
+    'btw-importer'
+);
+
+//Set the branch that contains the stable release.
+$myUpdateChecker->setBranch('main');
+
+//Optional: If you're using a private repository, specify the access token like this:
+$myUpdateChecker->setAuthentication('');
 
 class BTW_Importer {
     private $downloaded_images = []; // cache to avoid duplicate downloads
@@ -110,9 +125,20 @@ class BTW_Importer {
         check_ajax_referer( 'btw_importer_nonce', 'nonce' );
         $raw_post = isset($_POST['post']) ? wp_unslash($_POST['post']) : [];
         if ( empty($raw_post) ) wp_send_json_error('Missing post data.');
-
         $title     = sanitize_text_field($raw_post['title'] ?? '');
-        $content   = wp_kses_post($raw_post['content'] ?? '');
+        $allowed_tags = wp_kses_allowed_html( 'post' );
+        $allowed_tags['iframe'] = array(
+            'src'             => true,
+            'width'           => true,
+            'height'          => true,
+            'frameborder'     => true,
+            'allowfullscreen' => true,
+            'class'           => true,
+            'youtube-src-id'  => true,
+        );
+        $content_raw = $raw_post['content'] ?? '';
+        $content = wp_kses( $content_raw, $allowed_tags );
+
         $date      = sanitize_text_field($raw_post['date'] ?? '');
         $author    = sanitize_text_field($raw_post['author'] ?? '');
         $post_type = in_array($raw_post['post_type'], ['post','page']) ? $raw_post['post_type'] : 'post';

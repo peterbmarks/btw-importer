@@ -1,4 +1,4 @@
-[![Download Plugin](https://img.shields.io/badge/download_plugin-000?style=for-the-badge&logo=download&logoColor=white)](https://nasikin.web.id/download/btw-importer-v1.1.0.zip)
+[![Download Plugin](https://img.shields.io/badge/download_plugin-000?style=for-the-badge&logo=download&logoColor=white)](https://nasikin.web.id/download/btw-importer-v1.1.1.zip)
 
 # BtW Importer
 
@@ -42,6 +42,10 @@ A powerful yet simple migration tool, BtW Importer helps you seamlessly transfer
 6. Done! Your Blogger content is now in WordPress
 
 ## 🧾 Changelog
+
+### 1.1.1
+- Add Updater, so you won't miss an update
+- Fix embed content or iframe not imported
 
 ### 1.1.0 - 2025-07-10
 - Fix Pages imported as Posts. Should now correctly import pages as WordPress Pages
