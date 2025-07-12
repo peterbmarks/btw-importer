@@ -1,10 +1,9 @@
 === BtW Importer ===
 Contributors: silversh  
-Donate link: https://paypal.me/StoreDot2  
 Tags: blogger, blogspot, blogger importer, blogspot importer, import blogspot  
-Requires at least: 6.8  
+Requires at least: 6.8.1  
 Tested up to: 6.8  
-Stable tag: 1.1.1  
+Stable tag: 2.0.0  
 Requires PHP: 7.4  
 License: MIT  
 License URI: https://github.com/mnasikin/btw-importer/blob/main/LICENSE  
@@ -18,18 +17,38 @@ With just one click, BtW Importer lets you upload your .atom file from Google Ta
 
 Designed to be fast, reliable, and compatible with WordPress 6.8+, this plugin streamlines the process and saves you hours of manual work.
 
+== Features ==
+
 * Scans and downloads embedded images  
-* Replaces outdated URLs  
-* Sets featured images from the first post image  
-* Shows live progress during import  
+* Replaces outdated Blogger URLs with WordPress-friendly links  
+* Sets featured images using the first image in each post  
+* Displays real-time progress during import  
+* Supports image formats: `jpg, jpeg, png, gif, webp, bmp, svg, tiff, avif, ico`. Undownloaded images and videos still embedded, but with external files.  
+* Import content based on post type  
+* Keep external embedded content  
+* Posts or Pages date sync as date in the .atom file (e.g. your Blogspot post published on 2022/02/02, then the post in WordPress also 2022/02/02)  
+* Categories added or use existing category based on .atom file  
+* Only Blogspot/Google images downloaded, others external (saving your hosting storage, especially if you use external CDN)  
+* Only download original size images (avoid duplicated)  
+* Automatically add 301 redirect from Blogspot permalink to new WordPress URL to keep your SEO (only for post with `/YYYY/MM/slug.html` format)  
+* Redirect log page to check list of redirection has been made, also option to clear redirection logs
 
-Supports image formats: jpg, jpeg, png, gif, webp, bmp, svg, tiff, avif, ico.
+== Note ==
+Make sure to check your content after you import contents. Also, this plugin doesn't overwrite current post or pages, so if you've imported posts or pages and want to import again, kindly delete the previous imported posts, pages, and images.
 
-To get your `.atom` file:
-Blogger → Settings → Back Up → Download → Redirects to Google Takeout
+
+== Usage ==
+
+1. Download your `.atom` file:  
+   Blogger → Settings → Back Up → Download → redirects to Google Takeout  
+2. Open the BtW Importer menu in WordPress  
+3. Upload the `.atom` file from your local storage  
+4. Click Start Import  
+5. Monitor the live progress  
+6. Done! Your Blogger content is now in WordPress
 
 == Requirements ==
-* PHP 7.2 or later  
+* PHP 7.4 or later  
 * cURL PHP Extension  
 * `allow_url_fopen` enabled  
 * Writable `wp-content/uploads` folder (default setting already meets this)
@@ -42,21 +61,27 @@ Blogger → Settings → Back Up → Download → Redirects to Google Takeout
 == Screenshots ==
 1. Preview of the import process interface
 
-== Usage ==
-1. Download your Blogger `.atom` file from Google Takeout  
-2. Open the **BtW Importer** menu in WordPress  
-3. Upload the `.atom` file from your local storage  
-4. Click **Start Import**  
-5. Monitor the live progress  
-6. Done! Your Blogger content is now available in WordPress
-
 == Changelog ==
+= 2.0.0 =
+🔥 Major Update 🔥 
+
+* Add notice before you start importing (required)  
+* Add warning on leaving, reloading, or closing page during import to avoid accidentally stopping the process  
+* Add redirect log page to check list of redirection has been made, also option to clear redirection logs  
+* Add 301 redirect from Blogspot permalink to new WordPress URL to keep your SEO (only for post with `/YYYY/MM/slug.html` format). Only works if your previous Blogspot used the same Domain Name  
+* Posts or Pages date now sync as date in the .atom file (e.g. your Blogspot post published on 2022/02/02, then the post in WordPress also 2022/02/02)  
+* Categories added or use existing category based on .atom file  
+* Only Blogspot/Google images downloaded, others external (saving your hosting storage, especially if you use external CDN)  
+* Only download original size images (avoid duplicated)
+
 = 1.1.1 =
 * Add Updater, so you won't miss an update
 * Fix embed content or iframe not imported
-= 1.1.0 – 2025-07-10 =
+
+= 1.1.0 =
 * Fix Pages imported as Posts. Should now correctly import pages as WordPress Pages
-= 1.0.0 – 2025-07-08 =
+
+= 1.0.0 =
 * Initial release  
 * Replaced `parse_url()` with `wp_parse_url()`  
 * Used `wp_delete_file()` instead of `unlink()`  
@@ -64,9 +89,5 @@ Blogger → Settings → Back Up → Download → Redirects to Google Takeout
 * Sanitized content with `wp_kses_post()`
 
 == Upgrade Notice ==
-= 1.1.1 =
-Add Updater, so you won't miss an update and Fix embed content or iframe not imported
-= 1.1.0 =
-Fix Pages imported as Posts. Should now correctly import pages as WordPress Pages
-= 1.0.0 =
-Initial release of BtW Importer with basic Blogger migration features.
+= 2.0.0 =
+ Major Update! This release adds many features for your import process including add notice before import, add warning on leaving page while import in process, add redirect 301 from old blogspot permalink, add redirect log and clear redirect log, sync post and page published date, add or use category based on .atom file, only download image hosted on blogspot/google, only download original image to avoid duplicated image, security update, and some UI change.
