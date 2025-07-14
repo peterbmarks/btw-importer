@@ -50,6 +50,7 @@ Make sure to check your content after you import contents. Also, this plugin doe
 == Requirements ==
 * PHP 7.4 or later  
 * cURL PHP Extension  
+* `SimpleXML` PHP Extension
 * `allow_url_fopen` enabled  
 * Writable `wp-content/uploads` folder (default setting already meets this)
 
