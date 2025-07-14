@@ -1,4 +1,6 @@
-[![Download Plugin](https://img.shields.io/badge/download_plugin-000?style=for-the-badge&logo=download&logoColor=white)](https://github.com/mnasikin/btw-importer/releases/tag/v2.0.0)
+[![Download Plugin](https://img.shields.io/badge/download_plugin-000?style=for-the-badge&logo=download&logoColor=white)](https://github.com/mnasikin/btw-importer/releases)
+
+[![Changelog](https://img.shields.io/badge/changelog-fff?style=for-the-badge&logo=download&logoColor=black)](https://github.com/mnasikin/btw-importer/blob/main/changelog.md)  
 
 # BtW Importer
 
@@ -63,33 +65,4 @@ Make sure to check your content after you import contents. Also, this plugin doe
 
 ## 🧾 Changelog
 
-### 2.0.0
-🔥 Major Update 🔥
-- Add notice before you start importing (required)
-- Add warning on leaving, reloading, or closing page during import to avoid accidentaly stop the process
-- Add redirect log page to check list of redirection has beed made, also option to clear redirection logs
-- Add 301 redirect from blogspot permalink to new wordpress URL to keep your SEO (only for post with `/YYYY/MM/slug.html` format). Only work if your previous blogspot using same Domain Name
-- Posts or Pages date now sync as date in the .atom file (eg. your blogspot post published on 2022/02/02, then the post in wordpress also 2022/02/02)
-- Categories added or use existing category based on .atom file
-- Only blogspot/google images downloaded, others external (saving your hosting storage, especially if you use external CDN)
-- Only download originial size images (avoid duplicated)
-
-### 1.1.1
-- Add Updater, so you won't miss an update
-- Fix embed content or iframe not imported
-
-### 1.1.0
-- Fix Pages imported as Posts. Should now correctly import pages as WordPress Pages
-
-### 1.0.0
-- Initial release  
-- Replaced `parse_url()` with `wp_parse_url()`  
-- Used `wp_delete_file()` instead of `unlink()`  
-- Sanitized input using `wp_unslash()`  
-- Sanitized content with `wp_kses_post()`
-
-## 📢 Upgrade Notice
-
-### 2.0.0
-
-Major Update! This release adds many features for your import process including add notice before import, add warning on leaving page while import in process, add redirect 301 from old blogspot permalink, add redirect log and clear redirect log, sync post and page published date, add or use category based on .atom file, only download image hosted on blogspot/google, only download original image to avoid duplicated image, security update, and some UI change.
+The changelog is moved to dedicated [![Changelog](https://img.shields.io/badge/download_plugin-000?style=for-the-badge&logo=download&logoColor=white)](https://github.com/mnasikin/btw-importer/blob/main/changelog.md)

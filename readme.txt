@@ -3,7 +3,7 @@ Contributors: silversh
 Tags: blogger, blogspot, blogger importer, blogspot importer, import blogspot  
 Requires at least: 6.8.1  
 Tested up to: 6.8  
-Stable tag: 2.0.0  
+Stable tag: 2.1.0  
 Requires PHP: 7.4  
 License: MIT  
 License URI: https://github.com/mnasikin/btw-importer/blob/main/LICENSE  
@@ -63,6 +63,9 @@ Make sure to check your content after you import contents. Also, this plugin doe
 1. Preview of the import process interface
 
 == Changelog ==
+= 2.1.0 =
+* Fix draft and deleted content on .atom imported as published in WordPress
+
 = 2.0.0 =
 🔥 Major Update 🔥 
 
@@ -90,5 +93,5 @@ Make sure to check your content after you import contents. Also, this plugin doe
 * Sanitized content with `wp_kses_post()`
 
 == Upgrade Notice ==
-= 2.0.0 =
- Major Update! This release adds many features for your import process including add notice before import, add warning on leaving page while import in process, add redirect 301 from old blogspot permalink, add redirect log and clear redirect log, sync post and page published date, add or use category based on .atom file, only download image hosted on blogspot/google, only download original image to avoid duplicated image, security update, and some UI change.
+= 2.1.0 =
+ Please check the changelog tab to check what's new.

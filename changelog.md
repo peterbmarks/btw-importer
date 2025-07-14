@@ -7,6 +7,9 @@ A powerful yet simple migration tool, BtW Importer helps you seamlessly transfer
 
 ## 🧾 Changelog
 
+### 2.1.0
+- Fix draft and deleted content on .atom imported as published in WordPress
+
 ### 2.0.0
 🔥 Major Update 🔥
 - Add notice before you start importing (required)
