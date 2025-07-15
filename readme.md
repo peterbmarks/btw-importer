@@ -65,4 +65,4 @@ Make sure to check your content after you import contents. Also, this plugin doe
 
 ## 🧾 Changelog
 
-[![Changelog](https://img.shields.io/badge/changelog-fff?style=for-the-badge&logo=download&logoColor=black)](https://github.com/mnasikin/btw-importer/blob/main/changelog.md)  
+The Changelog moved to dedicated [![Changelog](https://img.shields.io/badge/changelog-fff?style=for-the-badge&logo=download&logoColor=black)](https://github.com/mnasikin/btw-importer/blob/main/changelog.md)  
