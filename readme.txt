@@ -63,6 +63,9 @@ Make sure to check your content after you import contents. Also, this plugin doe
 1. Preview of the import process interface
 
 == Changelog ==
+= 2.1.1 =
+* Fix updater not working when your plugin folder isn't using `btw-importer`. Usually when you download the plugin from github, the folder will be `btw-updater-x.x`
+
 = 2.1.0 =
 * Fix draft and deleted content on .atom imported as published in WordPress
 
