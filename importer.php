@@ -69,47 +69,51 @@ class BTW_Importer {
         $posts = [];
         foreach ($xml->entry as $entry) {
             $bloggerType = strtolower((string)$entry->children('blogger', true)->type);
-            $post_type = ($bloggerType === 'page') ? 'page' : 'post';
+            //$post_type = ($bloggerType === 'page') ? 'page' : 'post';
+            $post_type = $bloggerType;
+            if($post_type == 'page' || $post_type == 'post') {
+                $title = sanitize_text_field((string)$entry->title);
+                $content = (string)$entry->content;
+                $author = isset($entry->author->name) ? sanitize_text_field((string)$entry->author->name) : '';
 
-            $title = sanitize_text_field((string)$entry->title);
-            $content = (string)$entry->content;
-            $author = isset($entry->author->name) ? sanitize_text_field((string)$entry->author->name) : '';
+                $published_raw = (string)$entry->published;
+                $date_gmt = gmdate('Y-m-d H:i:s', strtotime($published_raw));
+                $date_local = get_date_from_gmt($date_gmt, 'Y-m-d H:i:s');
 
-            $published_raw = (string)$entry->published;
-            $date_gmt = gmdate('Y-m-d H:i:s', strtotime($published_raw));
-            $date_local = get_date_from_gmt($date_gmt, 'Y-m-d H:i:s');
-
-            // get categories
-            $categories = [];
-            foreach ($entry->category as $cat) {
-                $term = (string)$cat['term'];
-                if ($term && strpos($term, '#') !== 0) {
-                    $categories[] = sanitize_text_field($term);
+                // get categories
+                $categories = [];
+                foreach ($entry->category as $cat) {
+                    $term = (string)$cat['term'];
+                    if ($term && strpos($term, '#') !== 0) {
+                        $categories[] = sanitize_text_field($term);
+                    }
                 }
+
+                // get old permalink from <blogger:filename>
+                $filename = (string)$entry->children('blogger', true)->filename;
+                $filename = trim($filename);
+
+                // get blogger post status from <blogger:status>
+                $status_raw = strtolower((string)$entry->children('blogger', true)->status);
+                $status = 'publish'; // default
+                if ($status_raw === 'draft') $status = 'draft';
+                elseif ($status_raw === 'deleted') $status = 'trash';
+
+
+                $posts[] = [
+                    'title'      => $title,
+                    'content'    => $content,
+                    'author'     => $author,
+                    'post_type'  => $post_type,
+                    'date'       => $date_local,
+                    'date_gmt'   => $date_gmt,
+                    'categories' => $categories,
+                    'filename'   => $filename,
+                    'status'     => $status
+                ];
+            } else {
+                // presumably a comment. Skip for now
             }
-
-            // get old permalink from <blogger:filename>
-            $filename = (string)$entry->children('blogger', true)->filename;
-            $filename = trim($filename);
-
-            // get blogger post status from <blogger:status>
-            $status_raw = strtolower((string)$entry->children('blogger', true)->status);
-            $status = 'publish'; // default
-            if ($status_raw === 'draft') $status = 'draft';
-            elseif ($status_raw === 'deleted') $status = 'trash';
-
-
-            $posts[] = [
-                'title'      => $title,
-                'content'    => $content,
-                'author'     => $author,
-                'post_type'  => $post_type,
-                'date'       => $date_local,
-                'date_gmt'   => $date_gmt,
-                'categories' => $categories,
-                'filename'   => $filename,
-                'status'     => $status
-            ];
         }
 
         wp_send_json_success(['posts' => $posts]);
