@@ -1,6 +1,7 @@
 jQuery(document).ready(function($) {
     let isImporting = false;
-    
+    let gAllComments = [];  // keep all comments for later matching with posts
+
     // Enable button after checking the notice
     $('#agreeNotice').on('change', function() {
         if ($(this).is(':checked')) {
@@ -80,11 +81,14 @@ jQuery(document).ready(function($) {
                     $('#importOverlay').hide();
                 }
                 if (allComments.length)  {
-                    $('#progress').append('<br>' + allComments.length + ' Comments to import if they match id.');
+                    $('#progress').append('<br>' + allComments.length + ' New Comments to import if they match id.');
                     allComments.forEach(comment => {
                         $('#progress').append('<br>  parent_id = ' + comment.blogger_parent_id);
                     })
+                    // add them to the global collection of comments
+                    gAllComments.push(...allComments);
                 }
+                $('#progress').append('<br>' + gAllComments.length + ' Total Comments collected.');
             });
         };
         reader.readAsText(fileInput.files[0]);
@@ -100,6 +104,7 @@ jQuery(document).ready(function($) {
         $('#progress').append('<hr>');
         $('#progress').append('<br>📄 Importing ' + escapeHtml(post.post_type) + ': ' + escapeHtml(post.title));
         $('#progress').append('<br>   blogger id: ' + escapeHtml(post.blogger_id));
+        $('#progress').append('<br>' + gAllComments.length + ' Total Comments remaining.');
         scrollToBottom();
 
         $.post(btwImporter.ajaxUrl, {

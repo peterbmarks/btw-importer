@@ -30,9 +30,9 @@ class BTW_Importer {
     public function import_page() {
         echo '<div class="wrap">
             <h1>Google blogger takeout atom file Importer</h1>
-            <input type="file" id="atomFile" accept=".xml,.atom" />
+            <input type="file" id="atomFile" accept=".atom" />
             <button id="startImport" class="button button-primary">Start Import</button><br>
-            <label for="atomFile">Accepted File: .xml,.atom</label>
+            <label for="atomFile">Accepted File: .atom</label>
             <hr>
             <div id="importOverlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); color: #fff; font-size: 20px; z-index: 9999; text-align: center; padding-top: 20%;">
                 ⚠ Import in progress... Please don’t close, reload, or navigate away.
