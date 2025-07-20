@@ -176,6 +176,13 @@ class BTW_Importer {
 
         if (is_wp_error($post_id)) wp_send_json_error('❌ Failed to insert: '.$title);
 
+        $comment_id = wp_insert_comment([
+            'comment_post_ID' => $post_id,
+            'comment_author' => 'Author',
+            'comment_content' => 'Test comment'
+        ]);
+        if (is_wp_error($comment_id)) wp_send_json_error('❌ Failed to insert comment.');
+
         // add redirect meta & log redirect creation
         if ($filename) {
             if ($filename[0] !== '/') $filename = '/' . $filename;
