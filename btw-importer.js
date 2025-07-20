@@ -38,6 +38,8 @@ jQuery(document).ready(function($) {
                 }
 
                 const allItems = response.data.posts || [];
+                const allComments = response.data.comments || [];
+
                 if (!allItems.length) {
                     $('#progress').append('<br>⚠ No posts/pages found.');
                     isImporting = false;
@@ -48,6 +50,7 @@ jQuery(document).ready(function($) {
                 const pages = allItems.filter(item => item.post_type === 'page');
 
                 $('#progress').append('<br>✅ Found: ' + posts.length + ' posts and ' + pages.length + ' pages');
+                $('#progress').append('<br>✅ Found: ' + allComments.length + ' comments');
 
                 if (posts.length) {
                     importNext(0, posts, function() {
@@ -75,6 +78,10 @@ jQuery(document).ready(function($) {
                     $('#progress').append('<br>⚠ Nothing to import.');
                     isImporting = false;
                     $('#importOverlay').hide();
+                }
+                if (allComments.length)  {
+                    $('#progress').append('<br>' + allComments.length + '### Comments to import!.');
+                    
                 }
             });
         };

@@ -67,6 +67,7 @@ class BTW_Importer {
         if (!$xml) wp_send_json_error('Failed to parse XML.');
 
         $posts = [];
+        $comments = [];
         foreach ($xml->entry as $entry) {
             $bloggerType = strtolower((string)$entry->children('blogger', true)->type);
             //$post_type = ($bloggerType === 'page') ? 'page' : 'post';
@@ -111,12 +112,28 @@ class BTW_Importer {
                     'filename'   => $filename,
                     'status'     => $status
                 ];
-            } else {
+            } elseif($post_type == 'comment') {
                 // presumably a comment. Skip for now
+
+                $author = isset($entry->author->name) ? sanitize_text_field((string)$entry->author->name) : '';
+                $content = (string)$entry->content;
+                $status_raw = strtolower((string)$entry->children('blogger', true)->status);
+                $status = 'live'; // default
+                if ($status_raw === 'draft') $status = 'draft';
+                elseif ($status_raw === 'deleted') $status = 'trash';
+                error_log("### found a comment author = $author\n");
+                $comments[] = [
+                    'content'    => $content,
+                    'author'     => $author,
+                    'status'     => $status
+                ];
+            } else {
+                error_log("### unknown entry type " . $post_type . "\n");
             }
         }
 
-        wp_send_json_success(['posts' => $posts]);
+        wp_send_json_success(['posts' => $posts,
+                                'comments' => $comments]);
     }
 
     public function ajax_import_single_post() {
