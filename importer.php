@@ -29,25 +29,9 @@ class BTW_Importer {
 
     public function import_page() {
         echo '<div class="wrap">
-            <h1>BtW Importer</h1>
-            <p>A powerful yet simple migration tool, BtW Importer helps you seamlessly transfer posts, images, and formatting from Blogger (Blogspot) to WordPress. Don&apos;t forget to share this plugin if you found it&apos;s usefull</p>
-            <div id="importNotice" style="margin:20px;">
-            <h2>⚠️ Please Read Before Importing ⚠️</h2>
-            <ul>
-                <li>🛑 ️This plugin doesn&apos;t overwrite existing posts with the same name. If you&apos;ve previously used an importer, it&apos;s recommended to manually delete the previously imported content.</li>
-                <li>🛑 301 redirects only work if you previously used a custom domain on Blogspot and you&apos;re moving that domain to WordPress.</li>
-                <li>🛑 Make sure not to leave this page while the process is underway, or the import will stop, and you&apos;ll need to start from the beginning.</li>
-                <li>🛑 301 redirects work if this plugin is active and you have already run the importer.</li>
-                <li>🛑 Only image from Google/Blogspot will be downloaded.</li>
-                <li>🛑 Be sure to manually check your content after the import process is complete.</li>
-            </ul>
-              <input type="checkbox" id="agreeNotice">
-              <label for="agreeNotice">
-                I&apos;ve read all of them and I want to start the importer.
-              </label>
-            </div>
+            <h1>Google blogger takeout atom file Importer</h1>
             <input type="file" id="atomFile" accept=".xml,.atom" />
-            <button id="startImport" class="button button-primary" disabled>Start Import</button><br>
+            <button id="startImport" class="button button-primary">Start Import</button><br>
             <label for="atomFile">Accepted File: .xml,.atom</label>
             <hr>
             <div id="importOverlay" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); color: #fff; font-size: 20px; z-index: 9999; text-align: center; padding-top: 20%;">
