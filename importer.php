@@ -103,19 +103,26 @@ class BTW_Importer {
                 $author = isset($entry->author->name) ? sanitize_text_field((string)$entry->author->name) : '';
                 $content = (string)$entry->content;
                 $status_raw = strtolower((string)$entry->children('blogger', true)->status);
+                error_log("### comment status_raw = $status_raw\n");
                 $status = 'live'; // default
                 if ($status_raw === 'draft') $status = 'draft';
                 elseif ($status_raw === 'deleted') $status = 'trash';
+                elseif ($status_raw === 'spam_comment') $status = 'trash';
 
                 // which blogger post each comment is for
                 $blogger_parent_id = (string)$entry->children('blogger', true)->parent;
                 error_log("### found a comment author = $author\n");
-                $comments[] = [
-                    'content'    => $content,
-                    'author'     => $author,
-                    'status'     => $status,
-                    'blogger_parent_id' => $blogger_parent_id
-                ];
+                error_log("### status_raw = $status_raw, status = $status\n");
+                if($status == 'live') {
+                    $comments[] = [
+                        'content'    => $content,
+                        'author'     => $author,
+                        'status'     => $status,
+                        'blogger_parent_id' => $blogger_parent_id
+                    ];
+                } else {
+                    error_log("### skipping non-live comment\n");
+                }
             } else {
                 error_log("### unknown entry type " . $post_type . "\n");
             }
