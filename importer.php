@@ -100,6 +100,8 @@ class BTW_Importer {
                 if ($status_raw === 'draft') $status = 'draft';
                 elseif ($status_raw === 'deleted') $status = 'trash';
 
+                // get blogger post ID so we can match comments with their parent it
+                $blogger_post_id = (string)$entry->id;
 
                 $posts[] = [
                     'title'      => $title,
@@ -110,22 +112,25 @@ class BTW_Importer {
                     'date_gmt'   => $date_gmt,
                     'categories' => $categories,
                     'filename'   => $filename,
-                    'status'     => $status
+                    'status'     => $status,
+                    'blogger_id' => $blogger_post_id
                 ];
             } elseif($post_type == 'comment') {
-                // presumably a comment. Skip for now
-
                 $author = isset($entry->author->name) ? sanitize_text_field((string)$entry->author->name) : '';
                 $content = (string)$entry->content;
                 $status_raw = strtolower((string)$entry->children('blogger', true)->status);
                 $status = 'live'; // default
                 if ($status_raw === 'draft') $status = 'draft';
                 elseif ($status_raw === 'deleted') $status = 'trash';
+
+                // which blogger post each comment is for
+                $blogger_parent_id = (string)$entry->children('blogger', true)->parent;
                 error_log("### found a comment author = $author\n");
                 $comments[] = [
                     'content'    => $content,
                     'author'     => $author,
-                    'status'     => $status
+                    'status'     => $status,
+                    'blogger_parent_id' => $blogger_parent_id
                 ];
             } else {
                 error_log("### unknown entry type " . $post_type . "\n");

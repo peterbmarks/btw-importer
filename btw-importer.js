@@ -80,8 +80,10 @@ jQuery(document).ready(function($) {
                     $('#importOverlay').hide();
                 }
                 if (allComments.length)  {
-                    $('#progress').append('<br>' + allComments.length + '### Comments to import!.');
-                    
+                    $('#progress').append('<br>' + allComments.length + ' Comments to import if they match id.');
+                    allComments.forEach(comment => {
+                        $('#progress').append('<br>  parent_id = ' + comment.blogger_parent_id);
+                    })
                 }
             });
         };
@@ -97,6 +99,7 @@ jQuery(document).ready(function($) {
         const post = items[index];
         $('#progress').append('<hr>');
         $('#progress').append('<br>📄 Importing ' + escapeHtml(post.post_type) + ': ' + escapeHtml(post.title));
+        $('#progress').append('<br>   blogger id: ' + escapeHtml(post.blogger_id));
         scrollToBottom();
 
         $.post(btwImporter.ajaxUrl, {
